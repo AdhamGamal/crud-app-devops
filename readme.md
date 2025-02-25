@@ -63,27 +63,20 @@ git clone https://github.com/AdhamGamal/crud-app-devops.git
 cd crud-app-devops
 ```
 
-### **2️⃣ MongoDB Setup**
+### **2️⃣ Run the Setup Script**
 ```sh
-docker run --name mongo-container -d -p 27017:27017 mongo
+bash setup.sh
 ```
-This command will start a **MongoDB container** on port `27017`.
-
-### **3️⃣ Backend Setup (Manual Without Docker)**
-```sh
-cd backend
-npm install
-npm start
-```
-- Ensure MongoDB is running locally or via Docker.
-
-### **4️⃣ Frontend Setup (Manual Without Docker)**
-```sh
-cd frontend
-npm install
-npm start
-```
-- Open `http://localhost:3000` in your browser.
+This command will:
+- Install frontend and backend dependencies.
+- Build the frontend for production.
+- Create a Docker network (if not exists).
+- Build Docker images for the backend, frontend, and MongoDB.
+- Set up environment variables.
+- Stop and remove any existing containers.
+- Start new containers for MongoDB, backend, and frontend.
+- Display backend logs for debugging.
+- Open the application in the browser (Linux only).
 
 ---
 
@@ -98,7 +91,6 @@ npm start
 
 ## **📌 Next Steps**
 
-🔹 Containerization of backend and frontend using Docker 🐳
 🔹 Set up a CI/CD pipeline with GitHub Actions 🚀
 🔹 Deploy the application on Kubernetes (K8s) ☸️
 
@@ -117,10 +109,10 @@ npm start
 - Create Dockerfiles for both frontend and backend.
 - Build and push Docker images to a container registry (Docker Hub/GitHub Container Registry).
 
-### **3️⃣ CI/CD with GitHub Actions**
+### **2️⃣ CI/CD with GitHub Actions**
 - Automate builds and tests.
 - Deploy new versions to Kubernetes automatically on push to `main` branch.
 
-### **2️⃣ Kubernetes Deployment**
+### **3️⃣ Kubernetes Deployment**
 - Define Kubernetes manifests (Deployment, Service, and Ingress).
 - Use ConfigMaps and Secrets for managing environment variables.
