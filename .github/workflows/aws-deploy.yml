@@ -102,17 +102,19 @@ jobs:
           ssh-keyscan -H ${{ secrets.EC2_PUBLIC_IP }} >> ~/.ssh/known_hosts
           echo "✅ SSH setup completed."
 
-      - name: Install Docker on EC2
+      - name: Install Dependencies on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             echo "🔄 Updating packages..."
             sudo apt-get update
             echo "🐳 Installing Docker..."
             sudo apt-get install -y docker.io
+            echo "📥 Installing AWS CLI..."
+            sudo apt-get install -y awscli
             echo "🚀 Starting Docker service..."
             sudo systemctl enable docker
             sudo systemctl start docker
-            echo "✅ Docker installation completed!"
+            echo "✅ Dependencies installed!"
           EOF
 
       - name: Deploy Backend to EC2
