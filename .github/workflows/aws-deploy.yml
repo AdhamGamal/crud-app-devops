@@ -3,7 +3,7 @@ name: Deploy to AWS EC2 with MongoDB Atlas
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build_backend:
