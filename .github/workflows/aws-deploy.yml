@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+permissions:
+  id-token: write  # 🔥 Required for OIDC
+  contents: read
+
 jobs:
   build_backend:
     runs-on: ubuntu-latest
