@@ -22,7 +22,7 @@ jobs:
       - name: Build Backend Docker Image
         run: |
           echo "🐳 Building backend Docker image..."
-          docker build -t ${{ secrets.BACKEND_IMAGE }} -f devops/Dockerfile.backend .
+          docker build -t ${{ secrets.BACKEND_IMAGE }} -f devops/dockerfile.backend .
           echo "✅ Backend Docker image built."
 
       - name: Configure AWS Credentials
@@ -59,7 +59,7 @@ jobs:
       - name: Build Frontend Docker Image
         run: |
           echo "🐳 Building frontend Docker image..."
-          docker build -t ${{ secrets.FRONTEND_IMAGE }} -f devops/Dockerfile.frontend .
+          docker build -t ${{ secrets.FRONTEND_IMAGE }} -f devops/dockerfile.frontend .
           echo "✅ Frontend Docker image built."
 
       - name: Configure AWS Credentials
