@@ -1,0 +1,115 @@
+name: Deploy to AWS EC2 with MongoDB Atlas
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies & Build Backend
+        run: |
+          echo "🚀 Setting up backend..."
+          cd backend
+          npm install
+          echo "✅ Backend dependencies installed."
+
+      - name: Build Backend Docker Image
+        run: |
+          echo "🐳 Building backend Docker image..."
+          docker build -t ${{ secrets.BACKEND_IMAGE }} -f devops/Dockerfile.backend .
+          echo "✅ Backend Docker image built."
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Push Backend Image to Amazon ECR
+        run: |
+          echo "🚀 Pushing backend image to ECR..."
+          docker tag ${{ secrets.BACKEND_IMAGE }}:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.BACKEND_IMAGE }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.BACKEND_IMAGE }}
+          echo "✅ Backend image pushed to ECR."
+
+  build_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies & Build Frontend
+        run: |
+          echo "🚀 Setting up frontend..."
+          cd frontend
+          npm install
+          npm run build
+          echo "✅ Frontend build completed."
+
+      - name: Build Frontend Docker Image
+        run: |
+          echo "🐳 Building frontend Docker image..."
+          docker build -t ${{ secrets.FRONTEND_IMAGE }} -f devops/Dockerfile.frontend .
+          echo "✅ Frontend Docker image built."
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Push Frontend Image to Amazon ECR
+        run: |
+          echo "🚀 Pushing frontend image to ECR..."
+          docker tag ${{ secrets.FRONTEND_IMAGE }}:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.FRONTEND_IMAGE }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.FRONTEND_IMAGE }}
+          echo "✅ Frontend image pushed to ECR."
+
+  deploy:
+    needs: [build_backend, build_frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy Backend to EC2
+        run: |
+          echo "🚀 Deploying backend to EC2..."
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} "
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.BACKEND_IMAGE }}
+            docker stop backend || true
+            docker rm backend || true
+            docker run -d --name backend -p 5000:5000 \
+              --env MONGODB_URI=${{ secrets.MONGODB_URI }} \
+              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.BACKEND_IMAGE }}
+          "
+          echo "✅ Backend deployment completed."
+
+      - name: Deploy Frontend to EC2
+        run: |
+          echo "🚀 Deploying frontend to EC2..."
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} "
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.FRONTEND_IMAGE }}
+            docker stop frontend || true
+            docker rm frontend || true
+            docker run -d --name frontend -p 80:80 \
+              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ secrets.FRONTEND_IMAGE }}
+          "
+          echo "✅ Frontend deployment completed."
