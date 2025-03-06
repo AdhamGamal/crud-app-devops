@@ -5,7 +5,7 @@ import Popup from "./Popup";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const BASE_API_URL = process.env.REACT_APP_BASE_API_URL || "http://backend:5000"
+const BASE_API_URL = process.env.REACT_APP_BASE_API_URL || "http://localhost:5000"
 const socket = io(BASE_API_URL);
 
 export default function Table() {

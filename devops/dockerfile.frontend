@@ -1,6 +1,10 @@
 # Use Nginx to serve the pre-built frontend
 FROM nginx:alpine
 
+# Set build-time environment variables
+ARG REACT_APP_BASE_API_URL
+ENV REACT_APP_BASE_API_URL=${REACT_APP_BASE_API_URL}
+
 # Copy the built React app (built by GitHub Actions)
 COPY frontend/build /usr/share/nginx/html
 
