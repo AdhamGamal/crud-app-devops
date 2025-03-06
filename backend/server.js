@@ -8,10 +8,12 @@ import itemRoutes from "./routes/itemRoutes.js";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
+const morgan = require ("morgan")
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(morgan("dev"))
 
 // MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/crud_app";
