@@ -5,7 +5,8 @@ import Popup from "./Popup";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const socket = io("http://localhost:5000");
+const BASE_API_URL = process.env.BASE_API_URL || "http://localhost:5000"
+const socket = io(BASE_API_URL);
 
 export default function Table() {
   const [items, setItems] = useState([]);
@@ -22,7 +23,7 @@ export default function Table() {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/items");
+      const res = await axios.get(`${BASE_API_URL}/api/items`);
       setItems(res.data);
     } catch (error) {
       toast.error("Failed to fetch data");
@@ -34,7 +35,7 @@ export default function Table() {
   const deleteItem = async (id) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/items/${id}`);
+      await axios.delete(`${BASE_API_URL}/api/items/${id}`);
       socket.emit("update");
       toast.success("Item deleted successfully!");
     } catch (error) {

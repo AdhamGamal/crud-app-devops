@@ -3,7 +3,8 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 
-const socket = io("http://localhost:5000");
+const BASE_API_URL = process.env.BASE_API_URL || "http://localhost:5000"
+const socket = io(BASE_API_URL);
 
 export default function Popup({ isOpen, onClose, item }) {
   const [name, setName] = useState("");
@@ -27,10 +28,10 @@ export default function Popup({ isOpen, onClose, item }) {
     try {
       const data = { name, description };
       if (item) {
-        await axios.put(`http://localhost:5000/api/items/${item._id}`, data);
+        await axios.put(`${BASE_API_URL}/api/items/${item._id}`, data);
         toast.success("Item updated successfully!");
       } else {
-        await axios.post("http://localhost:5000/api/items", data);
+        await axios.post(`${BASE_API_URL}/api/items`, data);
         toast.success("Item added successfully!");
       }
 
