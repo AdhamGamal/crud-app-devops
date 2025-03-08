@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import morgan from "morgan";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import itemRoutes from "./routes/itemRoutes.js";
@@ -8,7 +9,6 @@ import itemRoutes from "./routes/itemRoutes.js";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
-const morgan = require ("morgan")
 
 // Middleware
 app.use(cors());
