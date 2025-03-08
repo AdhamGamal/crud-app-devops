@@ -5,8 +5,8 @@ import Popup from "./Popup";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const BASE_API_URL = process.env.REACT_APP_BASE_API_URL || "http://localhost:5000"
-const socket = io(BASE_API_URL);
+const BASE_API_URL = "/api";
+const socket = io(BASE_API_URL, { path: "/socket.io" });
 
 export default function Table() {
   const [items, setItems] = useState([]);

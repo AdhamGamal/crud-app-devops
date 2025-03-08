@@ -63,7 +63,7 @@ jobs:
       - name: Build Frontend Docker Image
         run: |
           echo "🐳 Building frontend Docker image..."
-          docker build --build-arg REACT_APP_BASE_API_URL="${{ secrets.BASE_API_URL }}" -t ${{ secrets.FRONTEND_IMAGE }} -f devops/dockerfile.frontend .
+          docker build -t ${{ secrets.FRONTEND_IMAGE }} -f devops/dockerfile.frontend .
           echo "✅ Frontend Docker image built."
 
       - name: Configure AWS Credentials

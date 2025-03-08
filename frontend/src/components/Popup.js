@@ -3,8 +3,8 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 
-const BASE_API_URL = process.env.REACT_APP_BASE_API_URL || "http://localhost:5000"
-const socket = io(BASE_API_URL);
+const BASE_API_URL = "/api";
+const socket = io(BASE_API_URL, { path: "/socket.io" });
 
 export default function Popup({ isOpen, onClose, item }) {
   const [name, setName] = useState("");
